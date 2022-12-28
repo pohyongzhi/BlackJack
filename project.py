@@ -93,7 +93,7 @@ class Deck:
             for card in cards:
                 self.cards_in_deck.append(Card(suits[suit], card))
 
-    def print_cards(self):
+    def return_cards(self):
         """
         This method prints the list of cards in the deck.
 
@@ -112,6 +112,17 @@ class Deck:
         """
         random.shuffle(self.cards_in_deck)
 
+    def deal_card(self):
+        """
+        This method deals a card to the player and remove it from the overall list.
+
+        returns:
+            card: A card from the top of the deck
+        """
+        card = self.cards_in_deck.pop(0)
+
+        return card
+        
     def count_cards(self):
         """
         This method prints the number of cards in the deck.
@@ -125,9 +136,14 @@ class Deck:
 def main():
     # Initialise the deck
     deck = Deck()
-    card_deck = deck.print_cards()
-    for card in card_deck:
-        print(card)
+    print(deck.deal_card())
+    # Return the list of cards by calling the deck.return_cards() method
+    card_deck = deck.return_cards()
+
+    print(deck.count_cards())
+    # # Iter over the list and print out the cards, as just printing the whole list will return the object memory location as python calls "__repr__" method instead of "__str__"
+    # for card in card_deck:
+    #     print(card)
  
 
 if __name__ == "__main__":
