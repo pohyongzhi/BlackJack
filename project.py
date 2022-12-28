@@ -25,35 +25,61 @@ if reject more cards say stay
 if <16 need take more cards
 """
 
+import random
+
+# Class to represent a single playing card
 class Card:
     """
-    This class have two methods used to populate a deck of 52 cards without "Joker".
+    This class represent a single playing card.
 
     Attributes:
-        suits (str): The symbol of a card.
-        cards (str): The value of a card.
+        value (str): The value of a card.
+        suit (str): The symbol of a card.
     """
-
-    def __init__(self, suits, cards):
+    def __init__(self, value, suit):
         """
         The constructor for Card class.
 
         Parameters:
-            suits (str): The symbol of a card.
-            cards (str): The value of a card.
+            value (str): The value of a card.
+            suit (str): The symbol of a card.
         """
+        self.value = value
+        self.suit = suit
 
-        self.suits = suits
-        self.cards = cards
-
-    def suits(self):
+    def __str__(self):
         """
-        This method returns a dictionary of suits.
+        This method prints the value and suit of the card.
 
         Returns:
-            suits: A dictionary of suits.
+            self.suit: suit of the card.
+            self.value: Value of the card.
         """
+        return "{} {}".format(self.suit, self.value)
 
+
+# Class to represent a full deck of cards
+class Deck:
+    """
+    This class represent a deck of card.
+    """
+    def __init__(self):
+        """
+        The constructor for Deck class.
+
+        Parameters:
+            cards_in_deck (list): A list of total cards in the deck.
+            populate() (method): Call method to populate the deck.
+            shuffle_deck() (method): Call method to randomly shuffle the deck.
+        """
+        self.cards_in_deck = []
+        self.populate()
+        self.shuffle_deck()
+    
+    def populate(self):
+        """
+        This method populate the empty deck of cards.
+        """
         suits = {
             "spade": "♠️",
             "heart": "♥️",
@@ -61,50 +87,48 @@ class Card:
             "club": "♣️"
         }
 
-        return suits
-
-    def cards(self):
-        """
-        This method returns a list of values for cards.
-
-        Return:
-            cards: A list of values for cards.
-        """
-
         cards = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
+
+        for count, suit in enumerate(suits):
+            for card in cards:
+                self.cards_in_deck.append(Card(suits[suit], card))
+
+    def print_cards(self):
+        """
+        This method prints the list of cards in the deck.
+
+        returns:
+            cards: A list of cards in the deck
+        """
+        cards = []
+        for card in self.cards_in_deck:
+            cards.append(card)
 
         return cards
 
-
-class Deck:
-    """
-    This class have methods to generate a deck, shuffle the deck, and dispense cards.
-
-    Attributes:
-        deck (str): A list of cards
-    """
-
-    def __init__(self, deck):
+    def shuffle_deck(self):
         """
-        The constructor for Deck class.
-
-        Parameters:
-            deck (str): A list of cards
+        This method shuffles the deck randomly.
         """
+        random.shuffle(self.cards_in_deck)
 
-        self.deck = deck
+    def count_cards(self):
+        """
+        This method prints the number of cards in the deck.
 
-    def generate_deck(self):
+        Returns:
+            len(self.cards_in_deck)
         """
-        This method generates a deck in a list using suits and cards methods from the Card class.
-        """
-        ...
+        return "{}".format(len(self.cards_in_deck))
 
 
 def main():
     # Initialise the deck
-
-
+    deck = Deck()
+    card_deck = deck.print_cards()
+    for card in card_deck:
+        print(card)
+ 
 
 if __name__ == "__main__":
     main()
