@@ -1,25 +1,6 @@
 # This program is a game of BlackJack where the player is able to versus the computer
 
-# Write a main game loop that allows the player to play multiple rounds of Blackjack.
-
-# Implement the rules of the game, including when the dealer must hit or stand and when the player wins, loses, or pushes (ties with the dealer).
-
 # Add additional features as desired, such as the ability to bet and keep track of the player's bankroll, or the option to play against multiple computer-controlled dealers.
-
-"""
-# RULES:
-if hand > 21 = bust
-
-dealer deals one card face up to each person, and one card faced down
-
-if A+10 = x1.5 amount
-
-if accept more card from dealer say hit
-
-if reject more cards say stay
-
-if <16 need take more cards
-"""
 
 import random, sys
 
@@ -270,64 +251,196 @@ def start_game():
     """
     Function to start game loop
     """
-    # Initialise the deck
+    # Set the classes as global variable 
+    global deck, player, dealer
+
+    # Initialise the deck object
     deck = Deck()
 
-    # First the dealer deals two card to each other
+    # Initialise the player an dealer object
     player = Player()
     dealer = Player()
 
-    card = deck.deal_card()
-    player.receive_card(card)
-
-    card = deck.deal_card()
-    dealer.receive_card(card)
-
-    card = deck.deal_card()
-    player.receive_card(card)
-
-    card = deck.deal_card()
-    dealer.receive_card(card)
-
-    print(player.show__hand())
-    print(dealer.show__hand())
+    # First the dealer deals two card to each other
+    deal_starting_cards()
 
     # Check for auto win criteria - E.g. AA, AJ, AQ, AK, A10
+    check_auto_win_criteria()
+
+    # Start the actual game if there are no auto win criteria
+    game_loop()
+
+
+def deal_starting_cards():
+    """
+    This method deals the starting card to the player and dealer
+    """
+    card = deck.deal_card()
+    player.receive_card(card)
+
+    card = deck.deal_card()
+    dealer.receive_card(card)
+
+    card = deck.deal_card()
+    player.receive_card(card)
+
+    card = deck.deal_card()
+    dealer.receive_card(card)
+
+    player_hand = player.show__hand()
+    dealer_hand = dealer.show__hand()
+
+    # Print new line
+    print("\n")
+
+    # Show player's hand to the player
+    print("Your cards are {}, {}".format(player_hand[0], player_hand[1]))
+
+    # Show dealer's first card to the player
+    print("Dealer's cards are {}, XX".format(dealer_hand[0]))
+    
+    # Print new line
+    print("\n")
+
+
+def check_auto_win_criteria():
+    """
+    Function to check if player or dealer auto win.
+    """
     player_auto_win_criteria, player_ace_count = False, 0
     dealer_auto_win_criteria, dealer_ace_count = False, 0
 
     player_auto_win_criteria, player_ace_count = player.auto_win()
     dealer_auto_win_criteria, dealer_ace_count = dealer.auto_win()
 
+    player_hand = player.show__hand()
+    dealer_hand = dealer.show__hand()
+
     # Check if game is a draw
     if player_auto_win_criteria == True and dealer_auto_win_criteria == True:
 
         if player_ace_count == 1 and dealer_auto_win_criteria == 1:
+            print("Your cards are {}, {}".format(player_hand[0], player_hand[1]))
+            print("Dealer's cards are {}, {}".format(dealer_hand[0], dealer_hand[1]))
             sys.exit("Game is a draw!")
 
         elif player_ace_count == 1 and dealer_ace_count == 0:
+            print("Your cards are {}, {}".format(player_hand[0], player_hand[1]))
+            print("Dealer's cards are {}, {}".format(dealer_hand[0], dealer_hand[1]))
             sys.exit("Player wins!")
 
         else:
-            sys.exit("Dealer wins!")            
+            print("Your cards are {}, {}".format(player_hand[0], player_hand[1]))
+            print("Dealer's cards are {}, {}".format(dealer_hand[0], dealer_hand[1]))
+            sys.exit("Dealer wins!")
 
     # Check if player wins
     if player_auto_win_criteria == True and dealer_auto_win_criteria == False:
-        sys.exit("Player wins!")
+            print("Your cards are {}, {}".format(player_hand[0], player_hand[1]))
+            print("Dealer's cards are {}, {}".format(dealer_hand[0], dealer_hand[1]))
+            sys.exit("Player wins!")
 
     # Check if dealer wins
     if player_auto_win_criteria == False and dealer_auto_win_criteria == True:
+        print("Your cards are {}, {}".format(player_hand[0], player_hand[1]))
+        print("Dealer's cards are {}, {}".format(dealer_hand[0], dealer_hand[1]))
         sys.exit("Dealer wins!")
 
-        # Player starts turn
 
+def game_loop():
+    """
+    This function creates a while loop until the both player and dealer ends their turn.
+    """
+    player_stand, dealer_stand = False, False
+    player_bust, dealer_bust = False, False
+
+    while player_stand == False and dealer_stand == False:
+        # Player starts turn
+        while player_stand == False and player_bust == False:
+            try:
+                choice = int(input("Enter 1 for Hit and 2 for Stand: \n"))
+
+                # If user hit draw a card till satisfied
+                if choice == 1:
+                    card = deck.deal_card()
+                    player.receive_card(card)
+
+                    # Show player's hand to player
+                    print("Your cards are: ")
+
+                    # Print the whole deck
+                    print("{}".format(', '.join(player.show__hand())))
+                    
+                    player_hand_value = player.calculate_hand()
+
+                    # Set player_stand and player_bust variable to True if player hand is above 21 to prevent player from drawing the whole deck
+                    if player_hand_value > 21:
+                        player_stand = True
+                        player_bust = True
+
+                # If user stands
+                else:
+                    player_stand = True
+
+            except ValueError:
+                print("Please only enter 1 or 2!")                
 
         # Dealers turn
+        while dealer_stand == False and dealer_bust == False:
+            dealer_hand_value = dealer.calculate_hand()
 
+            # Dealer will hit if hand value < 16
+            if dealer_hand_value <= 16:
+                card = deck.deal_card()
+                dealer.receive_card(card)
 
-        # If both stop show cards
+                dealer_hand_value = dealer.calculate_hand()
+                if dealer_hand_value > 21:
+                    dealer_bust = True
 
+            # Dealer will stand if hand value > 17
+            else:
+                dealer_stand = True
 
+    # If both stop calculate who won and show cards
+    player_hand_value = player.calculate_hand()
+    dealer_hand_value = dealer.calculate_hand()
+
+    # If player or dealer bust
+    if player_bust == True and dealer_bust == True:
+        print("Game is a draw! Both player and dealer bust!")
+        print("Your cards are {}".format(', '.join(player.show__hand())))
+        print("Dealer's cards are {}".format(', '.join(dealer.show__hand())))
+
+    elif player_bust == False and dealer_bust == True:
+        print("Player won! Dealer bust!")
+        print("Your cards are {}".format(', '.join(player.show__hand())))
+        print("Dealer's cards are {}".format(', '.join(dealer.show__hand())))
+
+    elif player_bust == True and dealer_bust == False:
+        print("Dealer won! Player bust!")
+        print("Your cards are {}".format(', '.join(player.show__hand())))
+        print("Dealer's cards are {}".format(', '.join(dealer.show__hand())))
+
+    # If nobody bust
+    else:
+        if player_hand_value > dealer_hand_value:
+            print("Player won! Value of player's hand is higher than dealer!")
+            print("Your cards are {}".format(', '.join(player.show__hand())))
+            print("Dealer's cards are {}".format(', '.join(dealer.show__hand())))
+
+        elif player_hand_value < dealer_hand_value:
+            print("Dealer won! Value of dealer's hand is higher than player!")
+            print("Your cards are {}".format(', '.join(player.show__hand())))
+            print("Dealer's cards are {}".format(', '.join(dealer.show__hand())))
+        
+        else:
+            print("Game is a draw! Value of player and dealer is equal!")
+            print("Your cards are {}".format(', '.join(player.show__hand())))
+            print("Dealer's cards are {}".format(', '.join(dealer.show__hand())))
+
+    # Print a new line
+    print("\n")
 
 # Function to show the rules of BlackJack
 def show_rules():
