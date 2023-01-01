@@ -25,21 +25,8 @@ import random, sys
 
 # Main function
 def main():
-    deck = Deck()
-    
-    john = Player()
-    card = deck.deal_card()
-    john.receive_card(card)
-    card = deck.deal_card()
-    john.receive_card(card)
-    card = deck.deal_card()
-    john.receive_card(card)
-    print(john.show__hand())
-
-    print(john.calculate_hand())
-
     # Get users choice
-    # menu_selection()
+    menu_selection()
 
 
 # Class to represent a single playing card
@@ -173,7 +160,7 @@ class Player:
         face_value_list = ["2", "3", "4", "5", "6", "7", "8", "9", "10"]
         picture_list = ["J", "Q", "K"]
         total_value = 0
-        ace_count = 0
+        ace_count = 0        
 
         # Check if ACE is in the hand
         for card in self.card_in_hand:
@@ -206,6 +193,39 @@ class Player:
 
         return total_value
 
+    def auto_win(self):
+        """
+        This method checks for auto win criteria - E.g. AA, Ak, AQ, AJ, A10
+        """
+        value_list = ["10", "J", "Q", "K"]
+        auto_win = False
+        ace_count = 0
+        total_value = 0
+
+        # Check if ACE is in the hand
+        for card in self.card_in_hand:
+            # Remove all symbol of J, Q, K, A, and space
+            card = card.rstrip("♠️♥️♦️♣️ ")
+            
+            if card == "A":
+                ace_count += 1
+
+        # Return auto_win and ace_count if player get AA
+        if ace_count == 2:
+            auto_win = True
+            return auto_win, ace_count
+
+        # Loop through the whole hand and check if card is any value other than ACE
+        for card in self.card_in_hand:
+            # Remove all symbol of J, Q, K, A, and space
+            card = card.rstrip("♠️♥️♦️♣️ ")
+
+            if ace_count == 1 and card in value_list:
+                auto_win = True
+                return auto_win, ace_count
+        
+        return auto_win, ace_count
+
     def show__hand(self):
         """
         This method shows all the card in the player's hand.
@@ -235,7 +255,7 @@ def menu_selection():
 
             # Data validation
             if choice == 1:
-                ...
+                start_game()
             elif choice == 2:
                 show_rules()
             else:
@@ -244,6 +264,69 @@ def menu_selection():
         except ValueError:
             print("Choice must be an integer and between value of 1-3!")
             pass
+
+# Function to run the main game loop
+def start_game():
+    """
+    Function to start game loop
+    """
+    # Initialise the deck
+    deck = Deck()
+
+    # First the dealer deals two card to each other
+    player = Player()
+    dealer = Player()
+
+    card = deck.deal_card()
+    player.receive_card(card)
+
+    card = deck.deal_card()
+    dealer.receive_card(card)
+
+    card = deck.deal_card()
+    player.receive_card(card)
+
+    card = deck.deal_card()
+    dealer.receive_card(card)
+
+    print(player.show__hand())
+    print(dealer.show__hand())
+
+    # Check for auto win criteria - E.g. AA, AJ, AQ, AK, A10
+    player_auto_win_criteria, player_ace_count = False, 0
+    dealer_auto_win_criteria, dealer_ace_count = False, 0
+
+    player_auto_win_criteria, player_ace_count = player.auto_win()
+    dealer_auto_win_criteria, dealer_ace_count = dealer.auto_win()
+
+    # Check if game is a draw
+    if player_auto_win_criteria == True and dealer_auto_win_criteria == True:
+
+        if player_ace_count == 1 and dealer_auto_win_criteria == 1:
+            sys.exit("Game is a draw!")
+
+        elif player_ace_count == 1 and dealer_ace_count == 0:
+            sys.exit("Player wins!")
+
+        else:
+            sys.exit("Dealer wins!")            
+
+    # Check if player wins
+    if player_auto_win_criteria == True and dealer_auto_win_criteria == False:
+        sys.exit("Player wins!")
+
+    # Check if dealer wins
+    if player_auto_win_criteria == False and dealer_auto_win_criteria == True:
+        sys.exit("Dealer wins!")
+
+        # Player starts turn
+
+
+        # Dealers turn
+
+
+        # If both stop show cards
+
 
 
 # Function to show the rules of BlackJack
